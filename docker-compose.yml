@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:16
+    restart: always
+    environment:
+      TZ: "Asia/Tokyo"
+      POSTGRES_DB: chatapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postdb:/var/lib/postgresql/data
+      - ./postinit/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - backend-network
+
+  frontend:
+    build:
+      context: .        # プロジェクトルートにする！
+      dockerfile: docker/frontend/Dockerfile-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/src
+    command: [sh, -c, "cd /src && npm install && npm run dev"]
+    networks:
+      - shared-network
+
+  backend:
+    build:
+      context: .        # プロジェクトルートにする！
+      dockerfile: docker/backend/Dockerfile-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/src
+    command: [sh, -c, "cd /src && npm install && npm start"]
+    networks:
+      - backend-network
+      - shared-network
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
+  shared-network:
+    driver: bridge
+
+volumes:
+  postdb:
+

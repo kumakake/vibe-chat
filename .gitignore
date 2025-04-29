@@ -1,0 +1,7 @@
+/memo.txt
+/frontend/dist/*
+/frontend/.env.production
+/frontend/node_modules/*
+/backend/node_modules/*
+/postdb/*
+
