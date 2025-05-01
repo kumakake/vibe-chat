@@ -6,13 +6,13 @@ import Login from './pages/Login'
 import RequestRegistration from './pages/RequestRegistration'
 import CompleteRegistration from './pages/CompleteRegistration'
 import ChatApp from './pages/ChatApp'
-import { API_URL } from '@/config';
+import { API_URL, SOCKET_URL } from '@/config';
 
-import { io } from 'socket.io-client'
 import axios from 'axios'
 
+//import { io } from 'socket.io-client'
 //const socket = io('http://localhost:3001') // backend接続
-const socket = io( `${API_URL}` );
+//const socket = io( `${SOCKET_URL}` );
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>

@@ -42,6 +42,8 @@ services:
       dockerfile: docker/backend/Dockerfile-backend
     ports:
       - "3001:3001"
+    environment:
+      - PORT=3001
     volumes:
       - ./backend:/src
     command: [sh, -c, "cd /src && npm install && npm start"]

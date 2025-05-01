@@ -4,6 +4,8 @@ const pool = require('../db'); // PostgreSQL接続プール
 
 // 友達申請エンドポイント
 router.post('/request', async (req, res) => {
+  console.log( "friend/request start" );
+
   const { friendLoginId } = req.body;
   const loginId = req.headers['x-login-id']; // 例：仮にヘッダーからログインIDもらう（あとでちゃんと認証つける）
 
@@ -44,10 +46,14 @@ router.post('/request', async (req, res) => {
       [myUserId, friendUserId, 'pending']
     );
 
-	req.io.emit('updateFriends', { loginIds: [friendLoginId] });
+	console.log(`友達申請: ${loginId} -> ${friendLoginId}`);
+	req.io.emit('updateFriends', {
+		loginIds: [friendLoginId, loginId]
+	});
 
     res.json({ message: '友達申請を送信しました' });
   } catch (err) {
+  console.log( "friend/request e01" );
     console.error(err);
     res.status(500).json({ error: '申請処理に失敗しました' });
   }
@@ -55,6 +61,8 @@ router.post('/request', async (req, res) => {
 
 // 友達リスト取得
 router.get('/list', async (req, res) => {
+  console.log( "friend/list start" );
+
   const loginId = req.headers['x-login-id'];
 
   if (!loginId) {
@@ -138,6 +146,7 @@ router.post('/accept', async (req, res) => {
 
     await pool.query('COMMIT');
 
+	console.log(`友達申請: ${requesterLoginId} -> ${loginId}`);
 	req.io.emit('updateFriends', { loginIds: [loginId, requesterLoginId] });
 
     res.json({ message: '友達承認しました！' });

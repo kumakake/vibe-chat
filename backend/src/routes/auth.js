@@ -5,20 +5,16 @@ const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const pool = require('../db'); // PostgreSQL接続プール
+const sgMail   = require('@sendgrid/mail');
 
 /*
-const pool = new Pool({
-  host: 'postgres',
-  user: 'postgres',
-  password: 'password',
-  database: 'chatapp',
+const transporter = nodemailer.createTransport({
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT
 });
 */
 
-const transporter = nodemailer.createTransport({
-  host: 'mailhog',
-  port: 1025,
-});
+sgMail.setApiKey( process.env.SG_API );
 
 router.post('/request-registration', async (req, res) => {
   const { email } = req.body;
@@ -36,10 +32,19 @@ router.post('/request-registration', async (req, res) => {
       [email, token, expiresAt]
     );
 
-    const link = `http://localhost:5173/register/${token}`;
+//    const link = `http://localhost:5173/register/${token}`;
+    const link = `${process.env.FRONT_HOST}/register/${token}`;
 
+/*
     await transporter.sendMail({
       from: 'no-reply@example.com',
+      to: email,
+      subject: '【ChatApp】本登録のご案内',
+      text: `以下のリンクからログインIDとパスワードを登録してください。\n\n${link}\n\nこのリンクは24時間以内に登録してください。`,
+    });
+*/
+    const response = await sgMail.send({
+      from: 'vita@ai-trans-labo.fun',
       to: email,
       subject: '【ChatApp】本登録のご案内',
       text: `以下のリンクからログインIDとパスワードを登録してください。\n\n${link}\n\nこのリンクは24時間以内に登録してください。`,

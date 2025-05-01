@@ -1,11 +1,13 @@
-import { API_URL } from '@/config';
+import { API_URL, SOCKET_URL } from '@/config';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 
+console.log( `socket_url-->${SOCKET_URL}` );
+
 // const socket = io('http://localhost:3001');
-const socket = io( `${API_URL}` );
+const socket = io( `${SOCKET_URL}` );
 
 function ChatApp() {
   const navigate = useNavigate();
@@ -27,25 +29,34 @@ function ChatApp() {
 
     socket.emit('user_online', id);
 
-    socket.on('receive_message', (msg) => {
-      if (msg.sender === id) return;
-      if (msg.to === id) {
-        setChat((prev) => [...prev, msg]);
-        if (msg.sender !== selectedFriend) {
-          // ★未読カウントを増やす
-          setUnreadCounts((prev) => ({
-            ...prev,
-            [msg.sender]: (prev[msg.sender] || 0) + 1,
-          }));
-        }
-      }
-    });
+      socket.on('receive_message', (msg) => {
+		console.log('receive_message受信' );
 
-    socket.on('updateFriends', (data) => {
-      if (data.loginIds.includes(id)) {
-        fetchFriends();
-        fetchPendingRequests();
-      }
+        if (msg.sender === id) return;
+        if (msg.to === id) {
+          setChat((prev) => [...prev, msg]);
+          if (msg.sender !== selectedFriend) {
+            // ★未読カウントを増やす
+            setUnreadCounts((prev) => ({
+              ...prev,
+              [msg.sender]: (prev[msg.sender] || 0) + 1,
+            }));
+          }
+        }
+      });
+
+	socket.on('connect', () => {
+	  console.log('🟢 Socket connected:', socket.id);
+
+      socket.on('updateFriends', (data) => {
+		console.log('updateFriends受信    :', data );
+	    console.log('updateFriends loginID:', id );
+        if (data.loginIds.includes(id)) {
+	      console.log('fetchFriends / fetchPendingRequests 呼び出し');
+          fetchFriends();
+          fetchPendingRequests();
+        }
+      });
     });
 
     socket.on('update_user_status', (data) => {
@@ -95,7 +106,7 @@ function ChatApp() {
     try {
       const loginId = localStorage.getItem('loginId');
 //      const response = await axios.get('http://localhost:3001/friends/pending', {
-      const response = await axios.get(`${API_URL}/friends/penging`, {
+      const response = await axios.get(`${API_URL}/friends/pending`, {
         headers: { 'x-login-id': loginId },
       });
       setPendingRequests(response.data.pendingRequests);

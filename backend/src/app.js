@@ -7,7 +7,10 @@ const pool = require('./db'); // PostgreSQL接続プール
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*' }
+//  cors: { origin: '*' }
+    origin: ['https://vibe-chat.ai-trans-labo.fun'], // ← 本番URL
+    methods: ['GET', 'POST'],
+    credentials: true
 });
 
 app.use(cors());
@@ -119,7 +122,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3001, () => {
-  console.log('Backend server running on port 3001');
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`Backend server running on port ${PORT}`);
 });
-
