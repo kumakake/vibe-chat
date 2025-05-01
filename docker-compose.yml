@@ -43,7 +43,15 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - PORT=3001
+      - PORT:3001
+      - DB_HOST:'postgres'
+      - DB_USER:'postuser'
+      - DB_PASSWD:'your-passwd'
+      - DB_NAME:'chatapp_db'
+      - MAIL_HOST:'mailhog'
+      - MAIL_PORT:1025
+      - SG_API:"SG.xxxxxxxxxxxx"
+      - FRONT_HOST:'localhost:3001'
     volumes:
       - ./backend:/src
     command: [sh, -c, "cd /src && npm install && npm start"]

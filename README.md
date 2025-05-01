@@ -57,13 +57,6 @@ VITE_API_URL=http://localhost:3001
 ・frontend/.env.production
 VITE_API_URL=/api
 
-・backend/.env
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=yourpassword
-POSTGRES_DB=chatapp
-REDIS_HOST=redis
-REDIS_PORT=6379
-
 3. Docker起動
 docker compose up --build
 
@@ -82,6 +75,8 @@ npm run build
 export const API_URL = import.meta.env.VITE_API_URL;
 
 ・Socket.io の接続先も同様に VITE_SOCKET_URL などで環境ごとに切替可能。
+
+・メール送信は本番環境ではSendGridを使っています。
 
 ## 📜 ライセンス
 MIT License
